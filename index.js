@@ -3,7 +3,7 @@ const express = require("express");
 const munaiz = require("./api/munaiz");
 const nat = require("./api/nat");
 
-const PORT = 8000;
+const PORT = process.env.PORT || 8000;
 
 const app = express();
 
