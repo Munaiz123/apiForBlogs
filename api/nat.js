@@ -4,27 +4,30 @@ const axios = require("axios");
 
 const router = express.Router();
 
-let titleHTML = [];
 let blog = `https://www.nateliason.com`;
 
-router.get("/", (req, res) => {
-  axios
-    .get(`${blog}/blog`)
-    .then((response) => {
-      let html = response.data;
-      let $ = cheerio.load(html);
+// *** /nat/
+router.get("/", async (req, res) => {
+  try {
+    let { data } = await axios.get(`${blog}/blog`);
+    let $ = cheerio.load(data);
 
-      $("a", html).each(function () {
-        if ($(this).attr("class") === "blog-links w-inline-block") {
-          let title = $(this).children().text();
-          let url = `${blog}${$(this).attr("class")}`;
+    let articles = [];
 
-          titleHTML.push({ url, title });
-        }
-      });
-      res.json(titleHTML);
-    })
-    .catch((err) => console.log("ERR => ", err));
+    $("a", data).each(function () {
+      let obj = {};
+      if ($(this).attr("class") === "blog-links w-inline-block") {
+        obj.title = $(this).children().text();
+        obj.url = `${blog}${$(this).attr("class")}`;
+        articles.push(obj);
+      }
+    });
+
+    res.send(articles);
+  } catch (error) {
+    console.log("ERROR =>", error);
+    res.status(400);
+  }
 });
 
 module.exports = router;
